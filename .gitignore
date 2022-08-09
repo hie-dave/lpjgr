@@ -3,4 +3,8 @@
 *.so
 *.tar.gz
 *.rds
-
+src/lpj-guess
+.Rproj.user
+src/RcppExports.cpp
+R/RcppExports.R
+.Rhistory

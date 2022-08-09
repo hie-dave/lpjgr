@@ -1,6 +1,15 @@
 {
     "C_Cpp.default.includePath": [
         "/usr/lib/R/library/Rcpp/include",
-        "/usr/include/R"
+        "/usr/include/R",
+        "${workspaceRoot}/src/lpj-guess/framework",
+        "${workspaceRoot}/src/lpj-guess/doxygen",
+        "${workspaceRoot}/src/lpj-guess/cru/guessio",
+        "${workspaceRoot}/src/lpj-guess/benchmarks/extra_source/fluxnet/modules",
+        "${workspaceRoot}/src/lpj-guess/benchmarks/extra_source/watch_diurnal/modules",
+        "${workspaceRoot}/src/lpj-guess/libraries/plib",
+        "${workspaceRoot}/src/lpj-guess/libraries/guessnc",
+        "${workspaceRoot}/src/lpj-guess/libraries/gutil",
+        "${workspaceRoot}/src/lpj-guess/modules"
     ]
 }

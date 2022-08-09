@@ -1,0 +1,5 @@
+LPJG=lpj-guess
+LPJG_INCLUDES=-I$(LPJG)/framework -I$(LPJG)/cru/guessio -I$(LPJG)/benchmarks/extra_source/fluxnet/modules -I$(LPJG)/benchmarks/extra_source/watch_diurnal/modules -I$(LPJG)/libraries/plib -I$(LPJG)/libraries/guessnc -I$(LPJG)/libraries/gutil -I$(LPJG)/modules
+PKG_CXXFLAGS=$(LPJG_INCLUDES)
+PKG_LIBS=-L$(LPJG)
+
