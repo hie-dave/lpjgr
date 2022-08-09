@@ -1,0 +1,6 @@
+{
+    "C_Cpp.default.includePath": [
+        "/usr/lib/R/library/Rcpp/include",
+        "/usr/include/R"
+    ]
+}
