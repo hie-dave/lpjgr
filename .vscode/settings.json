@@ -11,5 +11,8 @@
         "${workspaceRoot}/src/lpj-guess/libraries/guessnc",
         "${workspaceRoot}/src/lpj-guess/libraries/gutil",
         "${workspaceRoot}/src/lpj-guess/modules"
+    ],
+    "C_Cpp.default.defines": [
+        "HAVE_NETCDF"
     ]
 }
