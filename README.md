@@ -92,4 +92,3 @@ Once this is done, we can begin running and querying things:
 
 - Rationalise output handling (search for outputs by data type)
 - `initialise()` currently simulates the 1st day up to just before the call to `canopy_exchange()`. Make this customisable, so that the user can run it up to a given point in the day, in order to experiment with other functions(?)
-- Input perturbation

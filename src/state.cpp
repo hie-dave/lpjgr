@@ -1,3 +1,4 @@
+#include "proxyinput.h"
 #include "state.h"
 #include "guess.h"
 
@@ -11,3 +12,6 @@ Stand* stand;
 
 // The first patch in the stand.
 Patch* patch;
+
+// The input module.
+ProxyInput* input_module;

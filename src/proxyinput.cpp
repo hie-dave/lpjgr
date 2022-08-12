@@ -1,6 +1,7 @@
 #include "proxyinput.h"
 #include "guess.h"
 #include "fluxnet.h"
+#include "state.h"
 
 ProxyInput::ProxyInput() {
     lat = 0;
@@ -76,21 +77,23 @@ bool ProxyInput::getgridcell(Gridcell& grid_cell) {
     return true;
 }
 
-bool ProxyInput::getclimate(Gridcell& grid_cell) {
+void ProxyInput::configure_gridcell(Gridcell* cell) {
     // Just use the stored values.
-    grid_cell.climate.co2 = co2;
-    grid_cell.climate.tmax = tmax;
-    grid_cell.climate.tmin = tmin;
-    grid_cell.climate.temp = (tmax + tmin) / 2;
-    grid_cell.climate.prec = prec;
-    grid_cell.climate.insol = insol;
-    grid_cell.climate.dtr = tmax - tmin;
-    grid_cell.climate.u10 = wind;
-    grid_cell.climate.relhum = relhum;
+    cell->climate.co2 = co2;
+    cell->climate.tmax = tmax;
+    cell->climate.tmin = tmin;
+    cell->climate.temp = (tmax + tmin) / 2;
+    cell->climate.prec = prec;
+    cell->climate.insol = insol;
+    cell->climate.dtr = tmax - tmin;
+    cell->climate.u10 = wind;
+    cell->climate.relhum = relhum;
+    cell->dNO3dep = ndep / 2;
+    cell->dNH4dep = ndep / 2;
+}
 
-    grid_cell.dNO3dep = ndep / 2;
-    grid_cell.dNH4dep = ndep / 2;
-
+bool ProxyInput::getclimate(Gridcell& grid_cell) {
+    configure_gridcell(&grid_cell);
     return true;
 }
 
@@ -107,40 +110,50 @@ void ProxyInput::getmanagement(Gridcell& grid_cell) {
 
 void ProxyInput::set_lat(double lat) {
     this->lat = lat;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_lon(double lon) {
     this->lon = lon;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_co2(double co2) {
     this->co2 = co2;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_tmin(double tmin) {
     this->tmin = tmin;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_tmax(double tmax) {
     this->tmax = tmax;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_prec(double prec) {
     this->prec = prec;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_insol(double insol) {
     this->insol = insol;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_ndep(double ndep) {
     this->ndep = ndep;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_wind(double wind) {
     this->wind = wind;
+    configure_gridcell(grid_cell);
 }
 
 void ProxyInput::set_relhum(double relhum) {
     this->relhum = relhum;
+    configure_gridcell(grid_cell);
 }

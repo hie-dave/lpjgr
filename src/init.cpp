@@ -73,7 +73,10 @@ void initialise(std::string insFile,
     double relhum) {
     initialise_shell();
 
-    ProxyInput input_module(
+    if (input_module) {
+        delete input_module;
+    }
+    input_module = new ProxyInput(
         lat,
         lon,
         co2,
@@ -91,7 +94,7 @@ void initialise(std::string insFile,
     printf("Reading instruction file...\n");
     read_instruction_file(insFile.c_str());
 
-    input_module.init();
+    input_module->init();
     output_modules.init();
 
 	// Nitrogen limitation
@@ -126,7 +129,7 @@ void initialise(std::string insFile,
     }
     grid_cell = new Gridcell;
 
-    if (!input_module.getgridcell(*grid_cell)) {
+    if (!input_module->getgridcell(*grid_cell)) {
         throw std::runtime_error("Gridlist contains no grid cells");
     }
 
@@ -134,14 +137,14 @@ void initialise(std::string insFile,
     grid_cell->climate.initdrivers(grid_cell->get_lat());
 
     printf("Initialising landcover...\n");
-    landcover_init(*grid_cell, &input_module);
+    landcover_init(*grid_cell, input_module);
 
     if (restart) {
         deserializer->deserialize_gridcell(*grid_cell);
         date.year = state_year;
     }
 
-    if (!input_module.getclimate(*grid_cell)) {
+    if (!input_module->getclimate(*grid_cell)) {
         char buf[60];
         sprintf(buf, "Unable to read met data for grid cell (%.2f, %.2f)", lat, lon);
         throw std::runtime_error(buf);
@@ -151,8 +154,8 @@ void initialise(std::string insFile,
     dailyaccounting_gridcell(*grid_cell);
     daylengthinsoleet(grid_cell->climate);
     crop_sowing_gridcell(*grid_cell);
-    landcover_dynamics(*grid_cell, &input_module);
-    input_module.getmanagement(*grid_cell);
+    landcover_dynamics(*grid_cell, input_module);
+    input_module->getmanagement(*grid_cell);
     manage_forests(*grid_cell);
 
     // Retrieve 1st stand from gridcell.

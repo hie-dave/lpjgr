@@ -56,61 +56,61 @@ class ProxyInput : public InputModule {
         void getmanagement(Gridcell&);
 
         /*
-        Change the hardcoded latitude.
+        Change the hardcoded latitude in this input object and the gridcell.
         @param lat: The new latitude.
         */
         void set_lat(double lat);
 
         /*
-        Change the hardcoded longitude.
+        Change the hardcoded longitude in this input object and the gridcell.
         @param lon: The new longitude.
         */
         void set_lon(double lon);
 
         /*
-        Change the hardcoded co2 value.
+        Change the hardcoded co2 value in this input object and the gridcell.
         @param co2: The new co2 value (ppm?).
         */
         void set_co2(double co2);
 
         /*
-        Change the hardcoded tmin value.
+        Change the hardcoded tmin value in this input object and the gridcell.
         @param tmin: The new tmin value (°C).
         */
         void set_tmin(double tmin);
 
         /*
-        Change the hardcoded tmax value.
+        Change the hardcoded tmax value in this input object and the gridcell.
         @param tmax: The new tmax value (°C).
         */
         void set_tmax(double tmax);
 
         /*
-        Change the hardcoded precipitation value.
+        Change the hardcoded precipitation value in this input object and the gridcell.
         @param prec: The new precipitation value (units?).
         */
         void set_prec(double prec);
 
         /*
-        Change the hardcoded insolation value.
+        Change the hardcoded insolation value in this input object and the gridcell.
         @param insol: The new insolation value (% sunshine).
         */
         void set_insol(double insol);
 
         /*
-        Change the hardcoded N deposition value.
+        Change the hardcoded N deposition value in this input object and the gridcell.
         @param ndep: The new N deposition value (units?).
         */
         void set_ndep(double ndep);
 
         /*
-        Change the hardcoded wind value.
+        Change the hardcoded wind value in this input object and the gridcell.
         @param wind: The new wind value (10m wind in km/h).
         */
         void set_wind(double wind);
 
         /*
-        Change the hardcoded relative humidity value.
+        Change the hardcoded relative humidity value in this input object and the gridcell.
         @param relhum: The new relative humidity value (fraction).
         */
         void set_relhum(double relhum);
@@ -154,6 +154,10 @@ class ProxyInput : public InputModule {
 
         // Management input module
         ManagementInput management_input;
+
+        // Configure climate data in the given gridcell.
+        // @param cell: The grid cell to be configured.
+        void configure_gridcell(Gridcell* cell);
 };
 
 #endif // _PROXY_INPUT_H_
