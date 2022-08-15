@@ -37,4 +37,10 @@ Get the individual with the specified name, or throw if not found.
 */
 Individual* get_individual(std::string name);
 
+/*
+Get the photosynthesis resutls for the specified PFT in the 1st stand.
+@param pft_name: Name of the pft.
+*/
+PhotosynthesisResult* get_photosynthesis(std::string pft_name);
+
 #endif // _MODEL_ACCESS_H_

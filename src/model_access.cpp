@@ -56,10 +56,6 @@ Rcpp::CharacterVector get_pft_names() {
     return names;
 }
 
-/*
-Get the individual with the specified name, or throw if not found.
-@param name: Name of the individual (case-sensitive).
-*/
 Individual* get_individual(std::string name) {
     // Create xtring object for convenient string comparisons.
     xtring xname(name.c_str());
@@ -86,4 +82,8 @@ Individual* get_individual(std::string name) {
     char buf[256];
     sprintf(buf, "Cannot find individual with name '%s'", name.c_str());
     throw std::runtime_error(buf);
+}
+
+PhotosynthesisResult* get_photosynthesis(std::string pft_name) {
+    return &(get_standpft(patch, pft_name)->photosynthesis);
 }

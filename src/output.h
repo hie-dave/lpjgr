@@ -4,10 +4,8 @@
 #include <string>
 
 /*
-Get a property of an individual.
-@param individual_name: Name of the individual.
-@param property_name: Name of the property.
+Register all available outputs. Called automatically from initialise().
 */
-double get_individual_property(std::string individual_name, std::string property_name);
+void register_outputs();
 
 #endif // _LPJGR_OUTPUT_H_

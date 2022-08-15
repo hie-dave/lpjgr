@@ -21,6 +21,7 @@
 #include "model_access.h"
 #include "proxyinput.h"
 #include "state.h"
+#include "output.h"
 
 CommandLineShell* shell;
 
@@ -91,7 +92,8 @@ void initialise(std::string insFile,
     GuessOutput::OutputModuleContainer output_modules;
 	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(output_modules);
 
-    printf("Reading instruction file...\n");
+    register_outputs();
+
     read_instruction_file(insFile.c_str());
 
     input_module->init();
@@ -133,10 +135,8 @@ void initialise(std::string insFile,
         throw std::runtime_error("Gridlist contains no grid cells");
     }
 
-    printf("Initialising climate drivers...\n");
     grid_cell->climate.initdrivers(grid_cell->get_lat());
 
-    printf("Initialising landcover...\n");
     landcover_init(*grid_cell, input_module);
 
     if (restart) {
@@ -178,7 +178,6 @@ void initialise(std::string insFile,
 
     // Retrieve patch from stand.
     patch = &stand->getobj();
-    printf("Created patch contains %d individuals\n", patch->vegetation.nobj);
     dailyaccounting_patch(*patch);
 
     if (run_landcover) {
