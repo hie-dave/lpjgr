@@ -3,4 +3,4 @@ LPJG_INCLUDES=-I$(LPJG)/framework -I$(LPJG)/cru/guessio -I$(LPJG)/benchmarks/ext
 # Can't use -Wall or -pedantic because guess.h generates lots of warnings.
 PKG_CXXFLAGS=$(LPJG_INCLUDES) -O0 -ggdb -Werror
 PKG_LIBS=-L$(LPJG)/build -lguess -O0 -ggdb
-MAKEFLAGS=-j8
+MAKEFLAGS=-j${nproc}
