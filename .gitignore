@@ -8,3 +8,4 @@ src/lpj-guess
 src/RcppExports.cpp
 R/RcppExports.R
 .Rhistory
+guess.log
