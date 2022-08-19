@@ -7,8 +7,8 @@
 library('lpjgr')
 
 # change to dave/run so we can use the data there
-setwd('../src/lpj-guess/run')
-insFile <- 'global_cf.ins'
+setwd('../src/lpj-guess/benchmarks/eucface/config')
+insFile <- 'eucface.ins'
 
 # dummy met data
 lat <- -27
@@ -25,15 +25,6 @@ relhum <- 0.5
 # call init()
 initialise(insFile, lat, lon, co2, tmin, tmax, prec, insol, ndep, wind, relhum)
 
-# # silly little function because why not
-# get_vcmaxes <- function() {
-#     vc_maxes <- c()
-#     for (pft in get_pft_names()) {
-#         vc_maxes[pft] <- get_spft_numeric_output(pft, 'vm')
-#     }
-#     return(vc_maxes)
-# }
-
 # get_vcmaxes()
 canexch()
 # get_vcmaxes()
@@ -41,9 +32,11 @@ canexch()
 pfts <- get_pft_names()
 outputs <- list_spft_numeric_outputs()
 
+cat('Available outputs:\n')
 for (output in outputs) {
     print(get_output_info(output))
 }
+cat('\n')
 
 data <- matrix(nrow = length(pfts), ncol = length(outputs))
 rownames(data) <- pfts
@@ -55,4 +48,4 @@ for (output_name in outputs) {
     }
 }
 
-data
+cat(data)
