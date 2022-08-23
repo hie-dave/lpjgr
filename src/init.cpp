@@ -97,7 +97,6 @@ void initialise(std::string insFile,
     output_modules = new GuessOutput::OutputModuleContainer;
 
 	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(*output_modules);
-    printf("num output modules = %d\n", GuessOutput::OutputModuleRegistry::get_instance().num_modules());
     register_outputs();
 
     read_instruction_file(insFile.c_str());
