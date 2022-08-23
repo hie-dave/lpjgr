@@ -45,7 +45,12 @@ ProxyInput::~ProxyInput() {
 }
 
 void ProxyInput::init() {
-    soil_input.init(param["file_soildata"].str);
+    xtring param_name = "file_soildata";
+    if (!param.find(param_name) && !ifEucFACE) {
+        throw std::runtime_error("file_soildata not found and ifEucFACE is false");
+    }
+    xtring file_soildata = param.find(param_name) ? param[param_name].str : "";
+    soil_input.init(file_soildata);
 	landcover_input.init();
 	management_input.init();
 }
