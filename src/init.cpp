@@ -25,7 +25,6 @@
 #include "proxyinput.h"
 #include "state.h"
 #include "output.h"
-#include "simulate.h"
 
 CommandLineShell* shell;
 
