@@ -3,6 +3,7 @@
 
 #include "proxyinput.h"
 #include "guess.h"
+#include "outputmodule.h"
 
 // Global state variables used by other LPJGR modules.
 
@@ -17,5 +18,8 @@ extern Patch* patch;
 
 // The input module.
 extern ProxyInput* input_module;
+
+// The output modules.
+extern GuessOutput::OutputModuleContainer* output_modules;
 
 #endif // _LPJGR_STATE_H_

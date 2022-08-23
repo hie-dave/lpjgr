@@ -8,6 +8,8 @@
 #include "inputmodule.h"
 #include "outputchannel.h"
 #include "outputmodule.h"
+#include "commonoutput.h"
+#include "miscoutput.h"
 #include "bvoc.h"
 #include "guessserializer.h"
 #include "parallel.h"
@@ -15,6 +17,7 @@
 #include "driver.h"
 #include "gutil.h"
 #include "shell.h"
+#include "outputmodule.h"
 
 // LPJGR includes.
 #include "init.h"
@@ -22,6 +25,7 @@
 #include "proxyinput.h"
 #include "state.h"
 #include "output.h"
+#include "simulate.h"
 
 CommandLineShell* shell;
 
@@ -89,15 +93,18 @@ void initialise(std::string insFile,
         wind,
         relhum);
 
-    GuessOutput::OutputModuleContainer output_modules;
-	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(output_modules);
+    GuessOutput::MiscOutput misc;
+    GuessOutput::CommonOutput common;
+    output_modules = new GuessOutput::OutputModuleContainer;
 
+	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(*output_modules);
+    printf("num output modules = %d\n", GuessOutput::OutputModuleRegistry::get_instance().num_modules());
     register_outputs();
 
     read_instruction_file(insFile.c_str());
 
     input_module->init();
-    output_modules.init();
+    output_modules->init();
 
 	// Nitrogen limitation
 	if (ifnlim && !ifcentury) {
