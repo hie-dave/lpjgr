@@ -1,4 +1,4 @@
-#include "proxyinput.h"
+#include "inputmodule.h"
 #include "state.h"
 #include "guess.h"
 #include "outputmodule.h"
@@ -15,7 +15,7 @@ Stand* stand;
 Patch* patch;
 
 // The input module.
-ProxyInput* input_module;
+InputModule* input_module;
 
 // The output modules.
 GuessOutput::OutputModuleContainer* output_modules;

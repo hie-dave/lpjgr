@@ -18,26 +18,23 @@
 #include "gutil.h"
 #include "shell.h"
 #include "outputmodule.h"
+#include "siteinput.h"
 
 // LPJGR includes.
 #include "init.h"
 #include "model_access.h"
-#include "proxyinput.h"
 #include "state.h"
 #include "output.h"
-
-CommandLineShell* shell;
+#include "simulate.h"
 
 /*
-Set our shell for the model to communicate with the world. This only
-needs to be done once, and I'm not sure of the effects of doing it
-multiple times. Failure to do this will result in a segfault.
+Set our shell for the model to communicate with the world. Failure to
+do this will result in a segfault.
 */
 void initialise_shell() {
-    if (!shell) {
-        shell = new CommandLineShell("guess.log");
-        set_shell(shell);
-    }
+    // set_shell uses smart pointers internally, so it will free up the
+    // shell instance for us.
+    set_shell(new CommandLineShell("guess.log"));
 }
 
 /*
@@ -52,48 +49,23 @@ void ensure_initialised() {
 /*
 Initialise the run. This **must** be called before canexch().
 
-@param lat: Latitude of the gridcell.
-@param lon: Longitude of the gridcell.
-@param co2: Daily atmospheric ambient CO2 content (ppm).
-@param tmin: Daily minimum temperature (°C).
-@param tmax: Daily maximum temperature (°C).
-@param prec: Daily precipitation (mm).
-@param insol: Daily insolation (units?).
-@param ndep: Daily total annual N deposition (units?).
-@param wind: Daily 10m wind speed (km/h).
-@param relhum: Daily relative humidity (fraction).
+@param insFile: Path to the .ins file.
 */
 // [[Rcpp::export]]
-void initialise(std::string insFile,
-    double lat,
-    double lon,
-    double co2,
-    double tmin,
-    double tmax,
-    double prec,
-    double insol,
-    double ndep,
-    double wind,
-    double relhum) {
+void initialise(std::string insFile) {
     initialise_shell();
 
     if (input_module) {
         delete input_module;
     }
-    input_module = new ProxyInput(
-        lat,
-        lon,
-        co2,
-        tmin,
-        tmax,
-        prec,
-        insol,
-        ndep,
-        wind,
-        relhum);
+    // todo: make input module type an argument
+    input_module = new SiteInput;
 
     GuessOutput::MiscOutput misc;
     GuessOutput::CommonOutput common;
+    if (output_modules) {
+        delete output_modules;
+    }
     output_modules = new GuessOutput::OutputModuleContainer;
 
 	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(*output_modules);
@@ -150,49 +122,25 @@ void initialise(std::string insFile,
     }
 
     if (!input_module->getclimate(*grid_cell)) {
-        char buf[60];
-        sprintf(buf, "Unable to read met data for grid cell (%.2f, %.2f)", lat, lon);
-        throw std::runtime_error(buf);
+        throw std::runtime_error("Unable to read met data for grid cell");
     }
-
-    // Now simulate the day until we are ready to call canopy_exchange().
-    dailyaccounting_gridcell(*grid_cell);
-    daylengthinsoleet(grid_cell->climate);
-    crop_sowing_gridcell(*grid_cell);
-    landcover_dynamics(*grid_cell, input_module);
-    input_module->getmanagement(*grid_cell);
-    manage_forests(*grid_cell);
 
     // Retrieve 1st stand from gridcell.
     Gridcell::iterator gc_itr = grid_cell->begin();
     if (gc_itr == grid_cell->end()) {
-        char buf[60];
-        sprintf(buf, "Grid cell (%.2f, %.2f) contains no stands", lat, lon);
-        throw std::runtime_error(buf);
+        throw std::runtime_error("Grid cell contains no stands");
     }
     stand = &*gc_itr;
 
-    dailyaccounting_stand(*stand);
-
     stand->firstobj();
     if (!stand->isobj) {
-        char buf[60];
-        sprintf(buf, "Grid cell(%.2f, %.2f) contains no stands", lat, lon);
-        throw std::runtime_error(buf);
+        throw std::runtime_error("Grid cell contains no stands");
     }
 
     // Retrieve patch from stand.
     patch = &stand->getobj();
-    dailyaccounting_patch(*patch);
 
-    if (run_landcover) {
-        nfert(*patch);
-    }
-
-    crop_sowing_patch(*patch);
-    crop_phenology(*patch);
-    leaf_phenology(*patch, grid_cell->climate);
-    interception(*patch, grid_cell->climate);
+    pre_canexch();
 
     // We are now ready to call canopy_exchange().
 }

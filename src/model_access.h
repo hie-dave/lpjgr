@@ -24,7 +24,12 @@ Find a Standpft within the given patch with the specified name.
 @param patch: Owner of the pft.
 @param name: Name of the pft.
 */
-Standpft* get_standpft(Patch* patch, std::string name);
+Standpft* get_standpft(std::string name);
+
+/*
+List all spft names.
+*/
+std::vector<std::string> list_spft_names();
 
 /*
 Get the names of all defined PFTs.
@@ -38,9 +43,8 @@ Get the individual with the specified name, or throw if not found.
 Individual* get_individual(std::string name);
 
 /*
-Get the photosynthesis resutls for the specified PFT in the 1st stand.
-@param pft_name: Name of the pft.
+Get the names of all established individuals.
 */
-PhotosynthesisResult* get_photosynthesis(std::string pft_name);
+std::vector<std::string> list_individuals();
 
 #endif // _MODEL_ACCESS_H_

@@ -1,12 +1,19 @@
+#ifndef _LPJGR_OUTPUT_REGISTRY_H_
+#define _LPJGR_OUTPUT_REGISTRY_H_
+
 #include <map>
+#include <string>
 #include <vector>
 
 #include "output_wrapper.h"
+#include "output_registry_base.h"
+#include "util.h"
 
 template<class tobj, typename tprop>
-class OutputRegistry {
+class OutputRegistry : public virtual OutputRegistryBase {
     private:
         std::map<std::string, OutputWrapper<tobj, tprop>*> output_map;
+    protected:
         std::string name;
 
         /*
@@ -15,7 +22,8 @@ class OutputRegistry {
         @param name: Name of the output.
         */
         void ensure_contains(std::string name) {
-            if (output_map.count(name) == 0) {
+            // fixme - we're iterating over the map twice. This should return an inter.
+            if (!contains(&output_map, name)) {
                 throw std::runtime_error("Output registry '" + this->name + "' does not contain output '" + name + "'");
             }
         }
@@ -51,17 +59,9 @@ class OutputRegistry {
         }
 
         /*
-        Check if this registry contains an output with the specified name.
-        @param name: Name of the output.
-        */
-        bool contains_output(std::string name) {
-            return output_map.count(name) > 0;
-        }
-
-        /*
         Return the names of all available outputs.
         */
-        std::vector<std::string> get_output_names() {
+        std::vector<std::string> list_output_names() {
             std::vector<std::string> result;
             for (auto iter = output_map.begin(); iter != output_map.end(); iter++) {
                 result.push_back(iter->first);
@@ -70,11 +70,29 @@ class OutputRegistry {
         }
 
         /*
-        Get metadata about the specified output.
+        Get units for the specified output.
         @param output_name: Name of the output.
         */
-        std::string get_output_info(std::string output_name) {
+        std::string get_units(std::string output_name) {
             ensure_contains(output_name);
-            return output_map[output_name]->get_info();
+            return output_map[output_name]->get_units();
+        }
+
+        /*
+        Get a description of the specified output.
+        @param output_name: Name of the output.
+        */
+        std::string get_description(std::string output_name) {
+            ensure_contains(output_name);
+            return output_map[output_name]->get_description();
+        }
+
+        /*
+        Return the size of the output registry.
+        */
+        int size() const {
+            return output_map.size();
         }
 };
+
+#endif // _LPJGR_OUTPUT_REGISTRY_H_

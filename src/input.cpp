@@ -1,53 +1,60 @@
 #include "input.h"
-#include "proxyinput.h"
 #include "state.h"
 
 // [[Rcpp::export]]
 void set_lat(double lat) {
-    input_module->set_lat(lat);
+    grid_cell->climate.lat = lat;
 }
 
 // [[Rcpp::export]]
 void set_lon(double lon) {
-    input_module->set_lon(lon);
+    // grid_cell->climate.lon = lon;
+    throw std::runtime_error("tbi");
 }
 
 // [[Rcpp::export]]
 void set_co2(double co2) {
-    input_module->set_co2(co2);
+    grid_cell->climate.co2 = co2;
+}
+
+void update_temp() {
+    grid_cell->climate.temp = (grid_cell->climate.tmax + grid_cell->climate.tmin) / 2.0;
 }
 
 // [[Rcpp::export]]
 void set_tmin(double tmin) {
-    input_module->set_tmin(tmin);
+    grid_cell->climate.tmin = tmin;
+    update_temp();
 }
 
 // [[Rcpp::export]]
 void set_tmax(double tmax) {
-    input_module->set_tmax(tmax);
+    grid_cell->climate.tmax = tmax;
+    update_temp();
 }
 
 // [[Rcpp::export]]
 void set_prec(double prec) {
-    input_module->set_prec(prec);
+    grid_cell->climate.prec = prec;
 }
 
 // [[Rcpp::export]]
 void set_insol(double insol) {
-    input_module->set_insol(insol);
+    grid_cell->climate.insol = insol;
 }
 
 // [[Rcpp::export]]
 void set_ndep(double ndep) {
-    input_module->set_ndep(ndep);
+    grid_cell->dNO3dep = ndep / 2;
+    grid_cell->dNH4dep = ndep / 2;
 }
 
 // [[Rcpp::export]]
 void set_wind(double wind) {
-    input_module->set_wind(wind);
+    grid_cell->climate.u10 = wind;
 }
 
 // [[Rcpp::export]]
 void set_relhum(double relhum) {
-    input_module->set_relhum(relhum);
+    grid_cell->climate.relhum = relhum;
 }

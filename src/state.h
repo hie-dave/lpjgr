@@ -1,7 +1,7 @@
 #ifndef _LPJGR_STATE_H_
 #define _LPJGR_STATE_H_
 
-#include "proxyinput.h"
+#include "inputmodule.h"
 #include "guess.h"
 #include "outputmodule.h"
 
@@ -17,7 +17,7 @@ extern Stand* stand;
 extern Patch* patch;
 
 // The input module.
-extern ProxyInput* input_module;
+extern InputModule* input_module;
 
 // The output modules.
 extern GuessOutput::OutputModuleContainer* output_modules;

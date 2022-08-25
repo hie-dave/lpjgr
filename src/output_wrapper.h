@@ -44,6 +44,20 @@ class OutputWrapper {
         }
 
         /*
+        Get a description of the output.
+        */
+        std::string get_description() {
+            return description;
+        }
+
+        /*
+        Get the units of the output.
+        */
+        std::string get_units() {
+            return units;
+        }
+
+        /*
         Get info about the specified output.
         */
         std::string get_info() {

@@ -32,9 +32,25 @@ Patchpft* get_patchpft(Patch* patch, std::string name) {
     return &(patch->pft[pft->id]);
 }
 
-Standpft* get_standpft(Patch* patch, std::string name) {
+Standpft* get_standpft(std::string name) {
     Pft* pft = get_pft(patch, name);
     return &(patch->stand.pft[pft->id]);
+}
+
+/*
+List all spft names.
+*/
+std::vector<std::string> list_spft_names() {
+    ensure_initialised();
+
+    std::vector<std::string> spft_names;
+    if (patch->pft.firstobj()) {
+        while (patch->pft.isobj) {
+            spft_names.push_back((const char*)patch->pft.getobj().pft.name);
+            patch->pft.nextobj();
+        }
+    }
+    return spft_names;
 }
 
 // [[Rcpp::export]]
@@ -84,6 +100,26 @@ Individual* get_individual(std::string name) {
     throw std::runtime_error(buf);
 }
 
-PhotosynthesisResult* get_photosynthesis(std::string pft_name) {
-    return &(get_standpft(patch, pft_name)->photosynthesis);
+/*
+Get the names of all established individuals.
+*/
+std::vector<std::string> list_individuals() {
+    // Ensure that initialise() has been called.
+    ensure_initialised();
+
+    std::vector<std::string> individual_names;
+
+    // Attempt to move to front of list.
+    Vegetation veggies = patch->vegetation;
+
+    if (veggies.firstobj()) {
+        // Iterate through individuals.
+        while (veggies.isobj) {
+            Individual& individual = veggies.getobj();
+            individual_names.push_back((const char*)individual.pft.name);
+            veggies.nextobj();
+        }
+    }
+
+    return individual_names;
 }
