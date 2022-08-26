@@ -34,11 +34,14 @@ typedef enum {
 // The current (temporal) state of the simulation.
 SimulationState simulation_state;
 
-/*
-Run a full LPJ-Guess simulation.
-@param input_module_name: Name of the input module to be used.
-@param ins_file: Path to the .ins file to be used.
-*/
+//'
+//' Run a full LPJ-Guess simulation.
+//'
+//' @param input_module_name: Name of the input module to be used.
+//' @param ins_file: Path to the .ins file to be used.
+//'
+//' @export
+//'
 // [[Rcpp::export]]
 void run_simulation(std::string input_module_name, std::string ins_file) {
     // This would normally be handled by initialise(), but as we're not calling
@@ -64,7 +67,6 @@ void read_todays_met_data() {
     }
 }
 
-// [[Rcpp::export]]
 void pre_canexch() {
     ensure_initialised();
 
@@ -123,6 +125,11 @@ void pre_canexch() {
     simulation_state = BEFORE_CANEXCH;
 }
 
+//'
+//' Run daily canopy exchange. This can be called multiple times on a single day.
+//'
+//' @export
+//'
 // [[Rcpp::export]]
 void canexch() {
     ensure_initialised();
@@ -140,7 +147,6 @@ void canexch() {
     simulation_state = AFTER_CANEXCH;
 }
 
-// [[Rcpp::export]]
 void post_canexch() {
     ensure_initialised();
 

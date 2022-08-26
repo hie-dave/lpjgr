@@ -53,7 +53,6 @@ std::vector<std::string> list_spft_names() {
     return spft_names;
 }
 
-// [[Rcpp::export]]
 Rcpp::CharacterVector get_pft_names() {
     // Ensure that initialise() has been called.
     ensure_initialised();
@@ -80,19 +79,19 @@ Individual* get_individual(std::string name) {
     ensure_initialised();
 
     // Attempt to move to front of list.
-    Vegetation veg = patch->vegetation;
-    if (!veg.firstobj()) {
+    if (!patch->vegetation.firstobj()) {
         throw std::runtime_error("Unable to get individual: no individuals are defined");
     }
 
     // Iterate through individuals.
-    while (veg.isobj) {
-        Individual& individual = veg.getobj();
+    while (patch->vegetation.isobj) {
+        Individual& individual = patch->vegetation.getobj();
         if (xname == individual.pft.name) {
             return &individual;
         }
-        veg.nextobj();
+        patch->vegetation.nextobj();
     }
+    patch->vegetation.firstobj();
 
     // Not found.
     char buf[256];
@@ -110,16 +109,15 @@ std::vector<std::string> list_individuals() {
     std::vector<std::string> individual_names;
 
     // Attempt to move to front of list.
-    Vegetation veggies = patch->vegetation;
-
-    if (veggies.firstobj()) {
+    if (patch->vegetation.firstobj()) {
         // Iterate through individuals.
-        while (veggies.isobj) {
-            Individual& individual = veggies.getobj();
-            individual_names.push_back((const char*)individual.pft.name);
-            veggies.nextobj();
+        while (patch->vegetation.isobj) {
+            Individual& individual = patch->vegetation.getobj();
+            std::string name = (char*)individual.pft.name;
+            individual_names.push_back(name);
+            patch->vegetation.nextobj();
         }
     }
-
+    patch->vegetation.firstobj();
     return individual_names;
 }

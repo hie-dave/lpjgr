@@ -11,6 +11,7 @@
             "program": "/usr/bin/Rscript",
             "args": [
                 "${workspaceRoot}/debug/debug.r"
+                // "-"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/debug",
@@ -24,7 +25,7 @@
                     "ignoreFailures": true
                 },
                 {
-                    "description":  "Set Disassembly Flavor to Intel",
+                    "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }

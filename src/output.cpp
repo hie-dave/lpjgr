@@ -43,97 +43,6 @@ ObjectOutputRegistryBase<double>* get_output_registry(std::string category_name)
     return pos->second;
 }
 
-// --------------------------------------------------------------------
-// User-callable (ie from R) functions.
-// --------------------------------------------------------------------
-
-/*
-Get an output with a given name, of an object with a given name, from an output
-category with a given name.
-
-@param category_name: Name of the output category.
-@param object_name: Name of the object.
-@param property_name: Name of the property.
-*/
-// [[Rcpp::export]]
-double get_output(std::string category_name, std::string object_name, std::string property_name) {
-    ensure_initialised();
-    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
-    return registry->get_output(object_name, property_name);
-}
-
-/*
-List all valid output categories.
-*/
-// [[Rcpp::export]]
-Rcpp::CharacterMatrix list_output_categories() {
-    ensure_initialised();
-
-    Rcpp::CharacterMatrix categories(numeric_outputs->size(), 2);
-    Rcpp::CharacterVector column_names = Rcpp::CharacterVector(2);
-    column_names[0] = "Name";
-    column_names[1] = "Description";
-    Rcpp::colnames(categories) = column_names;
-
-    std::map<std::string, ObjectOutputRegistryBase<double>*>::iterator iter;
-    int i = 0;
-    for (iter = numeric_outputs->begin(); iter != numeric_outputs->end(); iter++) {
-        categories[i++] = iter->first;
-        categories[i++] = iter->second->get_description();
-    }
-    return categories;
-}
-
-/*
-List the names of all valid outputs in the given category.
-
-@param category_name: Name of the category to which the output belongs.
-*/
-// [[Rcpp::export]]
-Rcpp::CharacterVector list_output_names(std::string category_name) {
-    ensure_initialised();
-
-    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
-    std::vector<std::string> outputs = registry->list_output_names();
-    return vec_to_rvec(outputs);
-}
-
-/*
-List the names of all valid objects in the given output category.
-
-@param category_name: Name of an output category (see `list_category_names()`).
-*/
-// [[Rcpp::export]]
-Rcpp::CharacterVector list_object_names(std::string category_name) {
-    ensure_initialised();
-
-    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
-    std::vector<std::string> object_names = registry->list_object_names();
-    return vec_to_rvec(object_names);
-}
-
-/*
-List metadata about a single output.
-*/
-// [[Rcpp::export]]
-Rcpp::CharacterMatrix list_output_metadata(std::string category_name, std::string output_name) {
-    ensure_initialised();
-
-    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
-
-    Rcpp::CharacterMatrix metadata(1, 3);
-    Rcpp::CharacterVector column_names = Rcpp::CharacterVector(3);
-    column_names[0] = "Name";
-    column_names[1] = "Description";
-    column_names[2] = "Units";
-    Rcpp::colnames(metadata) = column_names;
-
-    metadata[0] = output_name;
-    metadata[1] = registry->get_description(output_name);
-    metadata[2] = registry->get_units(output_name);
-    return metadata;
-}
-
 /*
 Return the total number of outputs in a certain registry.
 
@@ -196,10 +105,198 @@ Rcpp::CharacterMatrix create_output_metadata_table(int num_rows) {
     return metadata;
 }
 
-/*
-Get a table containing metadata for all outputs in a certain category.
-*/
-// [Rcpp::export]
+// --------------------------------------------------------------------
+// User-callable (ie from R) functions.
+// --------------------------------------------------------------------
+
+//'
+//' Read an output value from LPJ-Guess
+//' 
+//' @description 
+//'
+//' Ouputs in lpjgr are grouped by category and by object. E.g. there
+//' is an output category for individuals, and we can retrieve an
+//' output for a particular individual (identified by its name).
+//'
+//' @details
+//'
+//' Here is some sample code which prints the value of each output in
+//' each object in each category.
+//'
+//' ```R
+//' initialise(my_ins_file)
+//' categories <- list_output_categories()[, 'Name']
+//' for (category in categories) { 
+//'     cat(strrep('-', 72))
+//'     cat(paste('\nCategory:', category, '\n'))
+//'     outputs <- list_output_names(category)
+//'     objects <- list_object_names(category)
+//'     if (length(objects) == 0) {
+//'         cat(paste('No objects in category', category, '\n'))
+//'         next
+//'     }
+//'     data <- matrix(nrow = length(objects), ncol = length(outputs))
+//'     rownames(data) <- objects
+//'     colnames(data) <- outputs
+//'     for (obj in objects) { 
+//'         for (output in outputs) {
+//'             data[obj, output] <- get_output(category, obj, output)
+//'         }
+//'     }
+//'     print(data)
+//' }
+//' ```
+//'
+//' @param category_name: Name of the output category (see [list_output_categories]).
+//' @param object_name: Name of the object to which the output belongs (see [list_object_names]).
+//' @param property_name: Name of the output property (see [list_output_names]).
+//'
+//' @seealso [lpjgr]
+//' @seealso [list_output_categories]
+//' @seealso [list_object_names]
+//' @seealso [list_output_names]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+double get_output(std::string category_name, std::string object_name, std::string property_name) {
+    ensure_initialised();
+    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
+    return registry->get_output(object_name, property_name);
+}
+
+//'
+//' List all valid output categories
+//'
+//' @description
+//'
+//' This will return a matrix containing all output category names, and
+//' a description of each category.
+//'
+//' @seealso [get_output]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+Rcpp::CharacterMatrix list_output_categories() {
+    ensure_initialised();
+
+    Rcpp::CharacterMatrix categories(numeric_outputs->size(), 2);
+    Rcpp::CharacterVector column_names = Rcpp::CharacterVector(2);
+    column_names[0] = "Name";
+    column_names[1] = "Description";
+    Rcpp::colnames(categories) = column_names;
+
+    std::map<std::string, ObjectOutputRegistryBase<double>*>::iterator iter;
+    int row = 0;
+    for (iter = numeric_outputs->begin(); iter != numeric_outputs->end(); iter++) {
+        categories(row, 0) = iter->first;
+        categories(row, 1) = iter->second->get_description();
+        row++;
+    }
+    return categories;
+}
+
+//'
+//' List the names of all valid outputs in the given category
+//'
+//' @param category_name: Name of the category to which the output
+//'                       belongs (see [list_output_categories]).
+//'
+//' @seealso [list_output_categories]
+//' @seealso [get_output]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+Rcpp::CharacterVector list_output_names(std::string category_name) {
+    ensure_initialised();
+
+    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
+    std::vector<std::string> outputs = registry->list_output_names();
+    return vec_to_rvec(outputs);
+}
+
+//'
+//' List the names of all valid objects in the given output category
+//'
+//' @description
+//'
+//' Note that the valid objects in a category can change over the
+//' course of a simulation; e.g. in the case of individuals it grows
+//' due to establishment and mortality.
+//'
+//' @param category_name: Name of an output category (see
+//'                       [list_output_categories]).
+//'
+//' @seealso [list_output_categories]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+Rcpp::CharacterVector list_object_names(std::string category_name) {
+    ensure_initialised();
+
+    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
+    std::vector<std::string> object_names = registry->list_object_names();
+    return vec_to_rvec(object_names);
+}
+
+//'
+//' List metadata about a single output
+//'
+//' @description
+//'
+//' This will return the name, description, and units of the output.
+//'
+//' @details
+//'
+//' Data is returned in a character matrix containing one row per
+//' output.
+//'
+//' @param category_name: Name of the category to which the output
+//'                       belongs (see [list_output_categories]).
+//' @param output_name: Name of the output.
+//'
+//' @seealso [list_output_categories]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+Rcpp::CharacterMatrix list_output_metadata(std::string category_name, std::string output_name) {
+    ensure_initialised();
+
+    ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
+
+    Rcpp::CharacterMatrix metadata(1, 3);
+    Rcpp::CharacterVector column_names = Rcpp::CharacterVector(3);
+    column_names[0] = "Name";
+    column_names[1] = "Description";
+    column_names[2] = "Units";
+    Rcpp::colnames(metadata) = column_names;
+
+    metadata[0] = output_name;
+    metadata[1] = registry->get_description(output_name);
+    metadata[2] = registry->get_units(output_name);
+    return metadata;
+}
+
+//'
+//' Get metadata for all outputs in a certain category
+//'
+//' @details
+//'
+//' Data is returned in a character matrix containing one row per
+//' output.
+//'
+//' @param category_name: Name of the category (see
+//' [list_output_categories]).
+//'
+//' @seealso [list_output_categories]
+//'
+//' @export
+//'
+// [[Rcpp::export]]
 Rcpp::CharacterMatrix list_outputs_in_category(std::string category_name) {
     ensure_initialised();
 
@@ -212,8 +309,17 @@ Rcpp::CharacterMatrix list_outputs_in_category(std::string category_name) {
 }
 
 //' 
-//' Get a table containing metadata for all outputs.
+//' Get a table containing metadata for all outputs
+//'
+//' @description
+//'
+//' This function will display metadata (category, name, description,
+//' and units) for all available outputs in all categories.
+//'
+//' @seealso [get_output]
+//'
 //' @export
+//'
 // [[Rcpp::export]]
 Rcpp::CharacterMatrix list_all_outputs() {
     ensure_initialised();

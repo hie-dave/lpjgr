@@ -4,6 +4,18 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "document",
+            "type": "shell",
+            "command": "Rscript",
+            "args": [
+                "-e",
+                "'roxygen2::roxygenize()'"
+            ],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        },
+        {
             "label": "compileAttributes",
             "type": "shell",
             "command": "Rscript",
@@ -13,7 +25,8 @@
             ],
             "options": {
                 "cwd": "${workspaceRoot}"
-            }
+            },
+            // "dependsOn": "document"
         },
         {
             "label": "build",

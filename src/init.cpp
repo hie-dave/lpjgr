@@ -46,11 +46,29 @@ void ensure_initialised() {
     }
 }
 
-/*
-Initialise the run. This **must** be called before canexch().
-
-@param insFile: Path to the .ins file.
-*/
+//'
+//' Initialise the LPJ-Guess environment
+//'
+//' @description
+//'
+//' This will cause lpj-guess to parse the .ins file, initialise the
+//' output modules, and otherwise prepare a simulation run.
+//'
+//' This **must** be called before any other lpjgr functions.
+//'
+//' @details
+//'
+//' This is currently hardwired to use a siteinput input module. This will change
+//' at some point in the future, to make the input module user-configurable.
+//'
+//' In theory, it *should* be possible to call this multiple times, in order
+//' to re-initialise the lpj-guess environment, but I haven't tested that, so
+//' use at your own risk (for now).
+//'
+//' @param insFile: Path to the .ins file.
+//'
+//' @export
+//'
 // [[Rcpp::export]]
 void initialise(std::string insFile) {
     initialise_shell();

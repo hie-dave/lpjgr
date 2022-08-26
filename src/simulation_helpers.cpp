@@ -68,9 +68,28 @@ class NumTreePredicate : public predicate {
         }
 };
 
-/*
-Run the simulation until a given number of trees have been established.
-*/
+//'
+//' Simulate until tree establishment occurs
+//'
+//' @description
+//'
+//' Run the simulation until a given number of trees have been established.
+//'
+//' @details
+//'
+//' The simulation will be run using data indicated by the .ins file.
+//'
+//' ```
+//' initialise(my_ins_file)
+//' simulate_until_tree_establishment(1)
+//' list_object_names('individual')
+//' ```
+//'
+//' @param num_trees: Simulation will be run until at least this number of trees
+//'                   have been established.
+//'
+//' @export
+//'
 // [[Rcpp::export]]
 void simulate_until_tree_establishment(int num_trees) {
     NumTreePredicate expr(num_trees);
