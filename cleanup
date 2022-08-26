@@ -4,7 +4,6 @@
 # Therefore, suppress any error messages and always return exit code 0.
 # Note: this will suppress any legitimate errors.
 rm -r man 2>/dev/null
-rm -f NAMESPACE 2>/dev/null
 rm -f src/RcppExports.{cpp,o} 2>/dev/null
 rm -f R/RcppExports.R 2>/dev/null
 exit 0
