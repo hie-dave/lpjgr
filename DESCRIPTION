@@ -12,4 +12,4 @@ Encoding: UTF-8
 Imports: Rcpp (>= 1.0.9)
 LinkingTo: Rcpp
 RoxygenNote: 7.2.1
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, load = "source")
