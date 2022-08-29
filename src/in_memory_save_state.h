@@ -1,15 +1,17 @@
 #ifndef _LPJGR_IN_MEMORY_SAVE_STATE_H_
 #define _LPJGR_IN_MEMORY_SAVE_STATE_H_
 
+#include <memory>
+
 #include "isave_state.h"
-#include "simulation_state.h"
+#include "state.h"
 
 class InMemorySaveState : public ISaveState {
 	public:
 		/*
 		Save the current state of the simulation.
 		*/
-		void save() const;
+		void save();
 
 		/*
 		Load the previously-saved simulation state.

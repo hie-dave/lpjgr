@@ -5,7 +5,6 @@
 
 #include "disk_bound_save_state.h"
 #include "init.h"
-#include "simulation_state.h"
 #include "state.h"
 
 struct MetadataFile {
@@ -18,7 +17,6 @@ struct MetadataFile {
 
 	int year;
 	int dayofyear;
-	TemporalState temporal_state;
 	std::string instruction_file;
 
 	// Save metadata information to the given filename.
@@ -37,7 +35,6 @@ struct MetadataFile {
 MetadataFile::MetadataFile() {
 	year = state->date->year;
 	dayofyear = state->date->day;
-	temporal_state = state->temporal_state;
 	instruction_file = state->instruction_file;
 }
 
@@ -56,7 +53,6 @@ MetadataFile::MetadataFile(std::string dir) {
 		"%d-%d\n%d\n%s",
 		year,
 		dayofyear,
-		temporal_state,
 		instruction_file);
 
 	// 2. Close the file.
@@ -82,7 +78,6 @@ void MetadataFile::save(std::string dir) {
 		"%d-%d\n%d\n%s",
 		year,
 		dayofyear,
-		temporal_state,
 		instruction_file);
 	if (err < 0) {
 		throw std::runtime_error("Unable to write to metadata file '"
@@ -109,7 +104,7 @@ DiskBoundSaveState::DiskBoundSaveState(std::string directory)
 /*
 Save the current state of the simulation.
 */
-void DiskBoundSaveState::save() const {
+void DiskBoundSaveState::save() {
 	// Serialize grid cell.
 	GuessSerializer serialiser(dirname.c_str(), 0, 1);
     serialiser.serialize_gridcell(*state->grid_cell);
@@ -153,5 +148,4 @@ void DiskBoundSaveState::Load(SimulationState* state) const {
 	// 4. Store results in the state object.
 	state->date = &date;
 	state->instruction_file = metadata.instruction_file;
-	state->temporal_state = static_cast<TemporalState>(metadata.temporal_state);
 }

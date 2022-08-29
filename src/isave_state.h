@@ -1,7 +1,7 @@
 #ifndef _LPJGR_ISAVE_STATE_H_
 #define _LPJGR_ISAVE_STATE_H_
 
-#include "simulation_state.h"
+#include "state.h"
 
 /*
 An interface for any class which can save the current simulation state
@@ -12,7 +12,7 @@ class ISaveState {
 		/*
 		Save the current state of the simulation.
 		*/
-		virtual void save() const = 0;
+		virtual void save() = 0;
 
 		/*
 		Load the previously-saved simulation state.

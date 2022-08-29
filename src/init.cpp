@@ -26,7 +26,6 @@
 #include "state.h"
 #include "output.h"
 #include "simulate.h"
-#include "simulation_state.h"
 
 /*
 Set our shell for the model to communicate with the world. Failure to
@@ -195,7 +194,6 @@ void initialise_state(std::string insFile, SimulationState* state) {
 	state->instruction_file = insFile;
 	state->patch = patch;
 	state->stand = stand;
-	state->temporal_state = START_OF_DAY;
 
     // We are now ready to call simulation functions.
 }

@@ -1,33 +1,33 @@
 #ifndef _LPJGR_SIMULATE_H_
 #define _LPJGR_SIMULATE_H_
 
-typedef enum {
-    // At start of day
-    START_OF_DAY,
-    // Ready to call canopy_exchange()
-    BEFORE_CANEXCH,
-    // After canopy_exchange() has been called
-    AFTER_CANEXCH,
-    // At end of day
-    END_OF_DAY
-} TemporalState;
+/*
+An interface for classes which encapsulate a predicate expression. I've used
+this rather than function pointers for extra flexibility.
+*/
+class predicate {
+    public:
+        virtual bool evaluate() = 0;
+};
 
 /*
-Simulate the day until before canopy_exchange(). This must be called in the
-appropriate sequence (ie directly after post_canexch, but not multiple times
-in a row, and not after canexch()).
+Run the simulation until the given delegate returns true. This function can
+return partway through the day.
+
+Note that only the first patch and stand are simulated.
+
+@param delegate: Function pointer which is called each day and should return true to stop the simulation.
 */
-void pre_canexch();
+void simulate_until(bool (*delegate)());
 
 /*
-Run canopy exchange. May be called multiple times per day.
-*/
-void canexch();
+Run the simulation until the given delegate returns true. This function can
+return partway through the day.
 
-/*
-Simulate the rest of the day after canopy_exchange(). This must be called in
-the appropriate sequence (ie after call(s) to canexch()).
+Note that only the first patch and stand are simulated.
+
+@param delegate: Any predicate expression which should return true to halt simulation execution.
 */
-void post_canexch();
+void simulate_until(predicate* delegate);
 
 #endif // _LPJGR_SIMULATE_H_

@@ -7,7 +7,29 @@
 #include "guess.h"
 #include "outputmodule.h"
 
-#include "simulation_state.h"
+#include "state.h"
+
+struct SimulationState {
+    public:
+		~SimulationState() {
+			// For now, date is allocated on the runtime stack.
+			// (It's just holding the address of the global date.)
+
+			// These should not be NULL. But let's check anyway...
+			if (grid_cell) {
+				delete grid_cell;
+			}
+			if (input_module) {
+				delete input_module;
+			}
+		}
+		Gridcell* grid_cell;
+		Date* date;
+		std::string instruction_file;
+		InputModule* input_module;
+		Stand* stand;
+		Patch* patch;
+};
 
 // Global state variables used by other LPJGR modules.
 extern std::shared_ptr<SimulationState> state;

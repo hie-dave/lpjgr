@@ -2,7 +2,7 @@
 #define _LPJGR_INIT_H_
 
 #include <string>
-#include "simulation_state.h"
+#include "state.h"
 
 /*
 Check if initialise() has been called. Throw if it has not.

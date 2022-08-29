@@ -5,8 +5,9 @@
 #include "state.h"
 #include "guess.h"
 #include "outputmodule.h"
-#include "simulation_state.h"
+#include "state.h"
 #include "isave_state.h"
+#include "in_memory_save_state.h"
 
 #include "guessserializer.h"
 
@@ -47,12 +48,14 @@ void load_state(const ISaveState* loader) {
 //'
 //' @export
 //'
+// [[Rcpp::export]]
 int save_simulation_state() {
-    int id = save_states.size();
-    std::string temp_dir = "state-file-" + id;
+	// Save simulation state.
+    InMemorySaveState* saver = new InMemorySaveState();
+    saver->save();
 
-    // todo: implement in-memory states
-    save_state_to_dir(temp_dir);
+    int id = save_states.size();
+	save_states.push_back(saver);
 
     return id;
 }
@@ -71,17 +74,13 @@ int save_simulation_state() {
 //'
 //' @export
 //'
+// [[Rcpp::export]]
 void load_simulation_state(int state_id) {
-    if (save_states.size() <= state_id) {
+    if (state_id >= save_states.size()) {
         throw std::runtime_error("Invalid state id: " + state_id);
     }
-
-	// Load the state.
     ISaveState* saved_state = save_states[state_id];
 	load_state(saved_state);
-
-    // Remove the state loader, it's no longer valid.
-    save_states.erase(save_states.begin() + state_id);
 }
 
 //'
@@ -95,6 +94,7 @@ void load_simulation_state(int state_id) {
 //'
 //' @export
 //'
+// [[Rcpp::export]]
 void save_state_to_dir(std::string dirname) {
 	// Don't use the save state queue for this implementation.
 	std::unique_ptr<DiskBoundSaveState> state = std::unique_ptr<DiskBoundSaveState>(new DiskBoundSaveState(dirname));
@@ -113,6 +113,7 @@ void save_state_to_dir(std::string dirname) {
 //'
 //' @export
 //'
+// [[Rcpp::export]]
 void load_state_from_dir(std::string dirname) {
 	// Create a new DiskBoundLoader for this task.
 	// We don't use the save state queue for this implementation.

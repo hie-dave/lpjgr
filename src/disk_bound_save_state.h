@@ -3,7 +3,7 @@
 
 #include "isave_state.h"
 #include "simulate.h"
-#include "simulation_state.h"
+#include "state.h"
 
 /*
 A class which can save and load the simulation state to/from disk.
@@ -22,7 +22,7 @@ class DiskBoundSaveState : public ISaveState {
 		/*
 		Save the current state of the simulation.
 		*/
-		void save() const;
+		void save();
 
 		/*
 		Load the previously-saved simulation state.
