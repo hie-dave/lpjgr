@@ -17,7 +17,7 @@
 //' @export
 // [[Rcpp::export]]
 void set_lat(double lat) {
-    grid_cell->climate.lat = lat;
+    state->grid_cell->climate.lat = lat;
 }
 
 //'
@@ -56,11 +56,11 @@ void set_lon(double lon) {
 //' @export
 // [[Rcpp::export]]
 void set_co2(double co2) {
-    grid_cell->climate.co2 = co2;
+    state->grid_cell->climate.co2 = co2;
 }
 
 void update_temp() {
-    grid_cell->climate.temp = (grid_cell->climate.tmax + grid_cell->climate.tmin) / 2.0;
+    state->grid_cell->climate.temp = (state->grid_cell->climate.tmax + state->grid_cell->climate.tmin) / 2.0;
 }
 
 //'
@@ -79,7 +79,7 @@ void update_temp() {
 //' @export
 // [[Rcpp::export]]
 void set_tmin(double tmin) {
-    grid_cell->climate.tmin = tmin;
+    state->grid_cell->climate.tmin = tmin;
     update_temp();
 }
 
@@ -99,7 +99,7 @@ void set_tmin(double tmin) {
 //' @export
 // [[Rcpp::export]]
 void set_tmax(double tmax) {
-    grid_cell->climate.tmax = tmax;
+    state->grid_cell->climate.tmax = tmax;
     update_temp();
 }
 
@@ -119,7 +119,7 @@ void set_tmax(double tmax) {
 //' @export
 // [[Rcpp::export]]
 void set_prec(double prec) {
-    grid_cell->climate.prec = prec;
+    state->grid_cell->climate.prec = prec;
 }
 
 //'
@@ -138,7 +138,7 @@ void set_prec(double prec) {
 //' @export
 // [[Rcpp::export]]
 void set_insol(double insol) {
-    grid_cell->climate.insol = insol;
+    state->grid_cell->climate.insol = insol;
 }
 
 //'
@@ -157,8 +157,8 @@ void set_insol(double insol) {
 //' @export
 // [[Rcpp::export]]
 void set_ndep(double ndep) {
-    grid_cell->dNO3dep = ndep / 2;
-    grid_cell->dNH4dep = ndep / 2;
+    state->grid_cell->dNO3dep = ndep / 2;
+    state->grid_cell->dNH4dep = ndep / 2;
 }
 
 //'
@@ -177,7 +177,7 @@ void set_ndep(double ndep) {
 //' @export
 // [[Rcpp::export]]
 void set_wind(double wind) {
-    grid_cell->climate.u10 = wind;
+    state->grid_cell->climate.u10 = wind;
 }
 
 //'
@@ -196,5 +196,5 @@ void set_wind(double wind) {
 //' @export
 // [[Rcpp::export]]
 void set_relhum(double relhum) {
-    grid_cell->climate.relhum = relhum;
+    state->grid_cell->climate.relhum = relhum;
 }

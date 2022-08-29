@@ -2,6 +2,8 @@
 #define _MODEL_ACCESS_H_
 
 #include <Rcpp.h>
+#include <string>
+#include <vector>
 
 #include "guess.h"
 
@@ -46,5 +48,25 @@ Individual* get_individual(std::string name);
 Get the names of all established individuals.
 */
 std::vector<std::string> list_individuals();
+
+/*
+Get the climate object with the specified name.
+
+I'm taking a name argument here because it's required by the ObjectOutputregistry<T>
+interface. Possibly need to rethink this - but for now it could provide a
+convenient way to access past or future met data. Maybe.
+*/
+Climate* get_climate(std::string name);
+
+/*
+Get the list of valid climate object names. Currently only "today".
+See coment on get_climate(): need to rethink this.
+*/
+std::vector<std::string> list_climate_names();
+
+/*
+Get the number of trees established in the stand.
+*/
+int get_num_trees();
 
 #endif // _MODEL_ACCESS_H_

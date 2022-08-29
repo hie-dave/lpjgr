@@ -1,4 +1,5 @@
 #include "init.h"
+#include "model_access.h"
 #include "simulate.h"
 #include "simulation_helpers.h"
 #include "state.h"
@@ -59,14 +60,21 @@ class NumTreePredicate : public predicate {
         }
     private:
         int num_trees;
-        // Get the number of trees established in the stand.
-        // todo: move this somewhere better.
-        int get_num_trees() {
-            return count<Individual, Pft, Vegetation>(&(patch->vegetation), [](const Individual* indiv) -> bool {
-                return indiv->pft.lifeform == TREE;
-            });
-        }
 };
+
+//'
+//' Simulate 1 day without reading new met data.
+//'
+//' @description
+//'
+//' This function will run the simulation for 1 day without reading in new
+//' met data. This allows the previous day to be rerun
+//'
+//' @export
+//'
+void simulate_one_day() {
+
+}
 
 //'
 //' Simulate until tree establishment occurs

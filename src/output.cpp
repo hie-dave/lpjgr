@@ -23,6 +23,7 @@ void register_outputs() {
         numeric_outputs = new std::map<std::string, ObjectOutputRegistryBase<double>*>;
         numeric_outputs->emplace("individual", get_individual_outputs());
         numeric_outputs->insert(std::make_pair("spft", get_spft_outputs()));
+        numeric_outputs->emplace("met", get_met_outputs());
     }
 }
 

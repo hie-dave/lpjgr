@@ -16,4 +16,9 @@ Get available outputs for Stand PFTs.
 */
 ObjectOutputRegistryBase<double>* get_spft_outputs();
 
+/*
+Get available met outputs.
+*/
+ObjectOutputRegistryBase<double>* get_met_outputs();
+
 #endif // _LPJGR_OUTPUT_DEFINITIONS_H_

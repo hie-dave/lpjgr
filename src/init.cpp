@@ -26,6 +26,7 @@
 #include "state.h"
 #include "output.h"
 #include "simulate.h"
+#include "simulation_state.h"
 
 /*
 Set our shell for the model to communicate with the world. Failure to
@@ -41,9 +42,29 @@ void initialise_shell() {
 Check if initialise() has been called. Throw if it has not.
 */
 void ensure_initialised() {
-    if (!(grid_cell && stand && patch)) {
+    if (!(state->grid_cell && state->stand && state->patch)) {
         throw std::runtime_error("LPJ-Guess environment has not been initialised. Please call initialise().");
     }
+}
+
+/*
+Set the date object to the specified date.
+*/
+void initialise_date(Date* date, int year, int dayofyear) {
+	if (year < 0 || dayofyear >= Date::MAX_YEAR_LENGTH) {
+		char buf[256];
+		sprintf(buf, "Invalid date: year=%d, doy=%d", year, dayofyear);
+		throw std::runtime_error(buf);
+	}
+
+	if (date->year > year && date->day > dayofyear) {
+		throw std::runtime_error("Need to call date.init() before initialise_date()");
+	}
+
+	// The safe but (relatively) slow approach.
+	while (date->year < year || date->day < dayofyear) {
+		date->next();
+	}
 }
 
 //'
@@ -71,28 +92,45 @@ void ensure_initialised() {
 //'
 // [[Rcpp::export]]
 void initialise(std::string insFile) {
+    // Technically, we could probably reuse the same set of objects
+	// each time around, but for now I'm going to play it safe and
+	// rebuild the environment from scratch each time.
+	state = std::shared_ptr<SimulationState>(new SimulationState());
+	initialise_state(insFile, state.get());
+}
+
+/*
+This function exists for internal use only. It will initialise the
+specified state object but will otherwise have no effect on the global
+environment.
+
+Note: upon further consideration, the lpj-guess globals (see parameters.cpp)
+will be modified by this function. So it's sadly not as friendly as one
+might like.
+
+See initialise() for more details.
+
+@param insFile: Path to the instructionfile.
+@param state: The simulation state to be configured/initialised.
+*/
+void initialise_state(std::string insFile, SimulationState* state) {
     initialise_shell();
 
-    if (input_module) {
-        delete input_module;
-    }
     // todo: make input module type an argument
-    input_module = new SiteInput;
+    InputModule* input_module = new SiteInput;
 
     GuessOutput::MiscOutput misc;
     GuessOutput::CommonOutput common;
-    if (output_modules) {
-        delete output_modules;
-    }
-    output_modules = new GuessOutput::OutputModuleContainer;
 
-	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(*output_modules);
+	GuessOutput::OutputModuleContainer output_modules;
+
+	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(output_modules);
     register_outputs();
 
     read_instruction_file(insFile.c_str());
 
     input_module->init();
-    output_modules->init();
+    output_modules.init();
 
 	// Nitrogen limitation
 	if (ifnlim && !ifcentury) {
@@ -118,14 +156,7 @@ void initialise(std::string insFile) {
 
     date.init(1);
 
-    // Technically, we could probably reuse the same gridcell object each time
-    // this function is called. But for now, I'm just going to play it safe and
-    // create a new one every time.
-    if (grid_cell) {
-        delete(grid_cell);
-    }
-    grid_cell = new Gridcell;
-
+	Gridcell* grid_cell = new Gridcell;
     if (!input_module->getgridcell(*grid_cell)) {
         throw std::runtime_error("Gridlist contains no grid cells");
     }
@@ -143,22 +174,28 @@ void initialise(std::string insFile) {
         throw std::runtime_error("Unable to read met data for grid cell");
     }
 
-    // Retrieve 1st stand from gridcell.
+    // Retrieve 1st stand and from gridcell for easy access.
     Gridcell::iterator gc_itr = grid_cell->begin();
     if (gc_itr == grid_cell->end()) {
         throw std::runtime_error("Grid cell contains no stands");
     }
-    stand = &*gc_itr;
+    Stand* stand = &*gc_itr;
 
+    // Retrieve first patch from stand.
     stand->firstobj();
     if (!stand->isobj) {
-        throw std::runtime_error("Grid cell contains no stands");
+        throw std::runtime_error("Grid cell contains no patches");
     }
+    Patch* patch = &stand->getobj();
 
-    // Retrieve patch from stand.
-    patch = &stand->getobj();
+	// Store stuff in the state object.
+	state->date = &date; // Date is a global variable in lpj-guess...
+	state->grid_cell = grid_cell;
+	state->input_module = input_module;
+	state->instruction_file = insFile;
+	state->patch = patch;
+	state->stand = stand;
+	state->temporal_state = START_OF_DAY;
 
-    pre_canexch();
-
-    // We are now ready to call canopy_exchange().
+    // We are now ready to call simulation functions.
 }

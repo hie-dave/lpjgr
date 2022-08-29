@@ -1,6 +1,7 @@
 #include "init.h"
 #include "simulate.h"
 #include "state.h"
+#include "simulation_state.h"
 
 #include "guess.h"
 #include "commandlinearguments.h"
@@ -19,20 +20,6 @@
 #include "cropsowing.h"
 #include "cropphenology.h"
 #include "landcover.h"
-
-typedef enum {
-    // At start of day
-    START_OF_DAY,
-    // Ready to call canopy_exchange()
-    BEFORE_CANEXCH,
-    // After canopy_exchange() has been called
-    AFTER_CANEXCH,
-    // At end of day
-    END_OF_DAY
-} SimulationState;
-
-// The current (temporal) state of the simulation.
-SimulationState simulation_state;
 
 //'
 //' Run a full LPJ-Guess simulation.
@@ -59,7 +46,7 @@ THIS HAS SIDE EFFECTS!! Do **not** call this multiple times per day, or you
 will regret it.
 */
 void read_todays_met_data() {
-    if (!input_module->getclimate(*grid_cell)) {
+    if (!state->input_module->getclimate(*state->grid_cell)) {
         // No met data available - abort!
         char buf[256];
         sprintf(buf, "No more met data (date=%d-%d-%d)", date.get_calendar_year(), date.month, date.day);
@@ -72,57 +59,57 @@ void pre_canexch() {
 
     // Check state to make sure that this is a valid time
     // to be calling this function.
-    if (simulation_state == START_OF_DAY) {
+    if (state->temporal_state == START_OF_DAY) {
         // Read today's met data.
         read_todays_met_data();
-    } else if (simulation_state == END_OF_DAY) {
+    } else if (state->temporal_state == END_OF_DAY) {
         // Advance to next day of simulation.
         date.next();
 
         // Read today's met data.
         read_todays_met_data();
-    } else if (simulation_state == BEFORE_CANEXCH) {
+    } else if (state->temporal_state == BEFORE_CANEXCH) {
         canexch();
         post_canexch();
-    } else if (simulation_state == AFTER_CANEXCH) {
+    } else if (state->temporal_state == AFTER_CANEXCH) {
         post_canexch();
     } else {
-        throw std::runtime_error("Simulation in unknown state: " + simulation_state);
+        throw std::runtime_error("Simulation in unknown state: " + state->temporal_state);
     }
 
 	// Update daily climate drivers etc
-	dailyaccounting_gridcell(*grid_cell);
+	dailyaccounting_gridcell(*state->grid_cell);
 
 	// Calculate daylength, insolation and potential evapotranspiration
-	daylengthinsoleet(grid_cell->climate);
+	daylengthinsoleet(state->grid_cell->climate);
 
 	// Update crop sowing date calculation framework
-	crop_sowing_gridcell(*grid_cell);
+	crop_sowing_gridcell(*state->grid_cell);
 
 	// Dynamic landcover and crop fraction data during historical
 	// period and create/kill stands.
-	landcover_dynamics(*grid_cell, input_module);
+	landcover_dynamics(*state->grid_cell, state->input_module);
 
 	// Update dynamic management options
-	input_module->getmanagement(*grid_cell);
+	state->input_module->getmanagement(*state->grid_cell);
 
 	// Set forest management for all stands this year
-	manage_forests(*grid_cell);
+	manage_forests(*state->grid_cell);
 
-    dailyaccounting_stand(*stand);
-    dailyaccounting_patch(*patch);
+    dailyaccounting_stand(*state->stand);
+    dailyaccounting_patch(*state->patch);
 
     if (run_landcover) {
-        nfert(*patch);
+        nfert(*state->patch);
     }
 
-    crop_sowing_patch(*patch);
-    crop_phenology(*patch);
-    leaf_phenology(*patch, grid_cell->climate);
-    interception(*patch, grid_cell->climate);
+    crop_sowing_patch(*state->patch);
+    crop_phenology(*state->patch);
+    leaf_phenology(*state->patch, state->grid_cell->climate);
+    interception(*state->patch, state->grid_cell->climate);
 
     // Update simulation state.
-    simulation_state = BEFORE_CANEXCH;
+    state->temporal_state = BEFORE_CANEXCH;
 }
 
 //'
@@ -134,64 +121,64 @@ void pre_canexch() {
 void canexch() {
     ensure_initialised();
 
-    if (simulation_state == START_OF_DAY || simulation_state == END_OF_DAY) {
+    if (state->temporal_state == START_OF_DAY || state->temporal_state == END_OF_DAY) {
         pre_canexch();
-    } else if (simulation_state != BEFORE_CANEXCH && simulation_state != AFTER_CANEXCH) {
+    } else if (state->temporal_state != BEFORE_CANEXCH && state->temporal_state != AFTER_CANEXCH) {
         // It's fine to run canexch() multiple times consecutively (ie
         // state == AFTER_CANEXCH is fine).
-        throw std::runtime_error("Simulation in unknown state: " + simulation_state);
+        throw std::runtime_error("Simulation in unknown state: " + state->temporal_state);
     }
-    canopy_exchange(*patch, grid_cell->climate);
+    canopy_exchange(*state->patch, state->grid_cell->climate);
 
     // Update simulation state.
-    simulation_state = AFTER_CANEXCH;
+    state->temporal_state = AFTER_CANEXCH;
 }
 
 void post_canexch() {
     ensure_initialised();
 
-    if (simulation_state == START_OF_DAY || simulation_state == END_OF_DAY) {
+    if (state->temporal_state == START_OF_DAY || state->temporal_state == END_OF_DAY) {
         pre_canexch();
     }
-    if (simulation_state == BEFORE_CANEXCH) {
+    if (state->temporal_state == BEFORE_CANEXCH) {
         canexch();
     }
-    if (simulation_state != AFTER_CANEXCH) {
-        throw std::runtime_error("Simulation in unknown state: " + simulation_state);
+    if (state->temporal_state != AFTER_CANEXCH) {
+        throw std::runtime_error("Simulation in unknown state: " + state->temporal_state);
     }
 
     // Sum total required irrigation
-    irrigation(*patch);
+    irrigation(*state->patch);
     // Soil water accounting, snow pack accounting
-    soilwater(*patch, grid_cell->climate);
+    soilwater(*state->patch, state->grid_cell->climate);
 
     // Daily C allocation (cropland)
-    growth_daily(*patch);
+    growth_daily(*state->patch);
 
     // Soil organic matter and litter dynamics
-    som_dynamics(*patch, grid_cell->climate);
+    som_dynamics(*state->patch, state->grid_cell->climate);
 
     // Methane production/consumption on wetlands and peatlands (no methane dynamics for other stand types at present) 
-    methane_dynamics(*patch);
+    methane_dynamics(*state->patch);
 
     // BLAZE fire model
-    blaze_driver(*patch, grid_cell->climate);
+    blaze_driver(*state->patch, state->grid_cell->climate);
 
-    if (date.islastday && date.islastmonth) {
+    if (state->date->islastday && state->date->islastmonth) {
         // LAST DAY OF YEAR
         // Tissue turnover, allocation to new biomass and reproduction,
         // updated allometry
-        growth(*stand, *patch);
+        growth(*state->stand, *state->patch);
     }
-    crop_rotation(*stand);
-    if (date.islastday && date.islastmonth) {
+    crop_rotation(*state->stand);
+    if (state->date->islastday && state->date->islastmonth) {
         // Note that we should be doing this for all patches.
-        vegetation_dynamics(*stand, *patch);
+        vegetation_dynamics(*state->stand, *state->patch);
     }
 
     // Check mass balance.
-    grid_cell->balance.check_period(*grid_cell);
+    state->grid_cell->balance.check_period(*state->grid_cell);
 
     // Update simulation state.
-    simulation_state = END_OF_DAY;
+    state->temporal_state = END_OF_DAY;
 }
