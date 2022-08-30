@@ -121,7 +121,7 @@ Load the previously-saved simulation state.
 
 @param state: (out param): the new simulation state.
 */
-void DiskBoundSaveState::Load(SimulationState* state) const {
+void DiskBoundSaveState::Load(SimulationState* state) {
 	if (!state) {
 		throw std::runtime_error("Programmer error: must initialize state before calling load()");
 	}

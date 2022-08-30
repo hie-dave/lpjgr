@@ -25,13 +25,16 @@ THIS FUNCTION HAS SIDE EFFECTS.
 
 @param loader: A saved simulation state loader.
 */
-void load_state(const ISaveState* loader) {
+void load_state(ISaveState* loader) {
 	// Store results in a new SimulationState pointer.
 	std::shared_ptr<SimulationState> new_state = std::shared_ptr<SimulationState>(new SimulationState());
 	loader->Load(new_state.get());
 
 	// Global state variable now points to the new simulation state.
 	state = std::shared_ptr<SimulationState>(new_state);
+
+	// Some modules (e.g. soil) seem to depend on this being set.
+	restart = true;
 }
 
 //'
@@ -77,7 +80,9 @@ int save_simulation_state() {
 // [[Rcpp::export]]
 void load_simulation_state(int state_id) {
     if (state_id >= save_states.size()) {
-        throw std::runtime_error("Invalid state id: " + state_id);
+		std::ostringstream buf;
+		buf << "Invalid state id: " << state_id;
+        throw std::runtime_error(buf.str());
     }
     ISaveState* saved_state = save_states[state_id];
 	load_state(saved_state);

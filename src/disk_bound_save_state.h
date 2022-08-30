@@ -29,7 +29,7 @@ class DiskBoundSaveState : public ISaveState {
 
 		@param state: (out param): the new simulation state.
 		*/
-		void Load(SimulationState* state) const;
+		void Load(SimulationState* state);
 	private:
 		/*
 		Get the path to the metadata file.

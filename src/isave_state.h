@@ -19,7 +19,7 @@ class ISaveState {
 
 		@param state: (out param): the new simulation state.
 		*/
-		virtual void Load(SimulationState* state) const = 0;
+		virtual void Load(SimulationState* state) = 0;
 };
 
 #endif // _LPJGR_ISAVE_STATE_H_
