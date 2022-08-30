@@ -1,3 +1,4 @@
+#include "init.h"
 #include "input.h"
 #include "state.h"
 
@@ -17,6 +18,7 @@
 //' @export
 // [[Rcpp::export]]
 void set_lat(double lat) {
+	ensure_initialised();
     state->grid_cell->climate.lat = lat;
 }
 
@@ -36,6 +38,7 @@ void set_lat(double lat) {
 //' @export
 // [[Rcpp::export]]
 void set_lon(double lon) {
+	ensure_initialised();
     // grid_cell->climate.lon = lon;
     throw std::runtime_error("tbi");
 }
@@ -56,10 +59,12 @@ void set_lon(double lon) {
 //' @export
 // [[Rcpp::export]]
 void set_co2(double co2) {
+	ensure_initialised();
     state->grid_cell->climate.co2 = co2;
 }
 
 void update_temp() {
+	ensure_initialised();
     state->grid_cell->climate.temp = (state->grid_cell->climate.tmax + state->grid_cell->climate.tmin) / 2.0;
 }
 
@@ -79,6 +84,7 @@ void update_temp() {
 //' @export
 // [[Rcpp::export]]
 void set_tmin(double tmin) {
+	ensure_initialised();
     state->grid_cell->climate.tmin = tmin;
     update_temp();
 }
@@ -99,6 +105,7 @@ void set_tmin(double tmin) {
 //' @export
 // [[Rcpp::export]]
 void set_tmax(double tmax) {
+	ensure_initialised();
     state->grid_cell->climate.tmax = tmax;
     update_temp();
 }
@@ -119,6 +126,7 @@ void set_tmax(double tmax) {
 //' @export
 // [[Rcpp::export]]
 void set_prec(double prec) {
+	ensure_initialised();
     state->grid_cell->climate.prec = prec;
 }
 
@@ -138,6 +146,7 @@ void set_prec(double prec) {
 //' @export
 // [[Rcpp::export]]
 void set_insol(double insol) {
+	ensure_initialised();
     state->grid_cell->climate.insol = insol;
 }
 
@@ -157,6 +166,7 @@ void set_insol(double insol) {
 //' @export
 // [[Rcpp::export]]
 void set_ndep(double ndep) {
+	ensure_initialised();
     state->grid_cell->dNO3dep = ndep / 2;
     state->grid_cell->dNH4dep = ndep / 2;
 }
@@ -177,6 +187,7 @@ void set_ndep(double ndep) {
 //' @export
 // [[Rcpp::export]]
 void set_wind(double wind) {
+	ensure_initialised();
     state->grid_cell->climate.u10 = wind;
 }
 
@@ -196,5 +207,6 @@ void set_wind(double wind) {
 //' @export
 // [[Rcpp::export]]
 void set_relhum(double relhum) {
+	ensure_initialised();
     state->grid_cell->climate.relhum = relhum;
 }
