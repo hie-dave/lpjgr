@@ -15,15 +15,15 @@ void simulate_day(Gridcell& gridcell, InputModule* input_module);
 //'
 // [[Rcpp::export]]
 void simulate_day() {
-    if (!state->input_module->getclimate(*state->grid_cell)) {
-        // No met data available - abort!
-        char buf[256];
-        sprintf(buf, "No more met data (date=%d-%d-%d)", date.get_calendar_year(), date.month, date.day);
-        throw std::runtime_error(buf);
-    }
 	simulate_day(*state->grid_cell, state->input_module);
 	state->grid_cell->balance.check_period(*state->grid_cell);
 	date.next();
+    if (!state->input_module->getclimate(*state->grid_cell)) {
+        // No met data available - abort!
+        char buf[256];
+        sprintf(buf, "Day simulated successfully, but no more met data remaining (date=%d-%d-%d)", date.get_calendar_year(), date.month, date.day);
+        throw std::runtime_error(buf);
+    }
 }
 
 /*
