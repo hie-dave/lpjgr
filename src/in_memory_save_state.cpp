@@ -3,6 +3,7 @@
 
 #include "init.h"
 #include "in_memory_save_state.h"
+#include "model_access.h"
 #include "state.h"
 
 #include "guessserializer.h"
@@ -29,11 +30,10 @@ void InMemorySaveState::save() {
 	// Store some other metadata which will be needed later.
 	year = state->date->year;
 	doy = state->date->day;
-	start_year = state->date->first_calendar_year; // todo: check if I'm needed
 	ins_file_name = state->instruction_file;
 }
 
-void InMemorySaveState::Load(SimulationState* state) {
+void InMemorySaveState::Load(SimulationState* new_state) {
 	// Seek to start of streams (remember, load can be called multiple
 	// times).
 	state_buf.seekg(0, std::ios::beg);
@@ -43,14 +43,23 @@ void InMemorySaveState::Load(SimulationState* state) {
 	// fact that the user could have called initialise() between saving
 	// and loading the state (initialise() frustratingly changes a ton
 	// of global lpj-guess variables).
-	initialise_state(ins_file_name, state);
+	if (state->instruction_file != ins_file_name) {
+		initialise_state(ins_file_name, new_state);
+	} else {
+		new_state->grid_cell = state->grid_cell;
+		new_state->date = &date;
+		new_state->stand = get_stand(new_state->grid_cell);
+		new_state->patch = get_patch(new_state->stand);
+		new_state->input_module = state->input_module;
+		new_state->instruction_file = state->instruction_file;
+	}
 
 	// The gridcell object was initialised by the previous call, so we
 	// can now deserialize our previous state into the gridcell.
 	GuessDeserializer deserializer(&state_buf, &meta_buf);
-	deserializer.deserialize_gridcell(*state->grid_cell);
+	deserializer.deserialize_gridcell(*new_state->grid_cell);
 
 	// Set current simulation date.
-	initialise_date(state->date, year, doy);
-	// state->date->first_calendar_year = start_year;
+	new_state->date->init(1);
+	initialise_date(new_state->date, year, doy);
 }

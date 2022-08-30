@@ -32,10 +32,6 @@ class InMemorySaveState : public ISaveState {
 
 		// Day of year in which state was saved.
 		int doy;
-
-		// Start year in which state was saved (to allow for
-		// save_state() -> initialise() -> load_state()).
-		int start_year;
 };
 
 #endif // _LPJGR_IN_MEMORY_SAVE_STATE_H_

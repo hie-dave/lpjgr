@@ -8,6 +8,16 @@
 #include "guess.h"
 
 /*
+Get the first stand in the given grid cell. Throw if none found.
+*/
+Stand* get_stand(Gridcell* grid_cell);
+
+/*
+Get the first patch in the stand. Throw if none found.
+*/
+Patch* get_patch(Stand* stand);
+
+/*
 Find a pft in the given patch with the specified name.
 @param patch: Owner of the pft.
 @param name: Name of the pft.

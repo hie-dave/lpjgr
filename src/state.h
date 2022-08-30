@@ -11,18 +11,7 @@
 
 struct SimulationState {
     public:
-		~SimulationState() {
-			// For now, date is allocated on the runtime stack.
-			// (It's just holding the address of the global date.)
-
-			// These should not be NULL. But let's check anyway...
-			if (grid_cell) {
-				delete grid_cell;
-			}
-			if (input_module) {
-				delete input_module;
-			}
-		}
+		~SimulationState();
 		Gridcell* grid_cell;
 		Date* date;
 		std::string instruction_file;

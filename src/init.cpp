@@ -173,19 +173,8 @@ void initialise_state(std::string insFile, SimulationState* state) {
         throw std::runtime_error("Unable to read met data for grid cell");
     }
 
-    // Retrieve 1st stand and from gridcell for easy access.
-    Gridcell::iterator gc_itr = grid_cell->begin();
-    if (gc_itr == grid_cell->end()) {
-        throw std::runtime_error("Grid cell contains no stands");
-    }
-    Stand* stand = &*gc_itr;
-
-    // Retrieve first patch from stand.
-    stand->firstobj();
-    if (!stand->isobj) {
-        throw std::runtime_error("Grid cell contains no patches");
-    }
-    Patch* patch = &stand->getobj();
+    Stand* stand = get_stand(grid_cell);
+    Patch* patch = get_patch(stand);
 
 	// Store stuff in the state object.
 	state->date = &date; // Date is a global variable in lpj-guess...

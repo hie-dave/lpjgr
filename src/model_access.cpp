@@ -12,6 +12,30 @@
 
 const std::string CLIMATE_TODAY = "today";
 
+/*
+Get the first stand in the given grid cell. Throw if none found.
+*/
+Stand* get_stand(Gridcell* grid_cell) {
+	// Retrieve 1st stand and from gridcell for easy access.
+    Gridcell::iterator gc_itr = grid_cell->begin();
+    if (gc_itr == grid_cell->end()) {
+        throw std::runtime_error("Grid cell contains no stands");
+    }
+	return &*gc_itr;
+}
+
+/*
+Get the first patch in the stand. Throw if none found.
+*/
+Patch* get_patch(Stand* stand) {
+	// Retrieve first patch from stand.
+    stand->firstobj();
+    if (!stand->isobj) {
+        throw std::runtime_error("Grid cell contains no patches");
+    }
+    return &stand->getobj();
+}
+
 Pft* get_pft(Patch* patch, std::string name) {
 
     if (!patch->pft.firstobj()) {

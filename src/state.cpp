@@ -8,6 +8,7 @@
 #include "state.h"
 #include "isave_state.h"
 #include "in_memory_save_state.h"
+#include "util.h"
 
 #include "guessserializer.h"
 
@@ -125,4 +126,20 @@ void load_state_from_dir(std::string dirname) {
 	// We don't use the save state queue for this implementation.
     DiskBoundSaveState loader(dirname);
 	load_state(&loader);
+}
+
+// SimulationState destructor.
+SimulationState::~SimulationState() {
+	// For now, date is allocated on the runtime stack.
+	// (It's just holding the address of the global date.)
+
+	// These should not be NULL. But let's check anyway...
+	if (grid_cell && state->grid_cell != grid_cell) {
+		// grid_cell can be reused by other save states. Only free it if
+		// it's not currently being shared.
+		delete grid_cell;
+	}
+	if (input_module && state->input_module != input_module) {
+		delete input_module;
+	}
 }
