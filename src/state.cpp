@@ -35,6 +35,7 @@ void load_state(ISaveState* loader) {
 
 	// Some modules (e.g. soil) seem to depend on this being set.
 	restart = true;
+	state_year = date.year;
 }
 
 //'
