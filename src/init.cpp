@@ -41,7 +41,7 @@ void initialise_shell() {
 Check if initialise() has been called. Throw if it has not.
 */
 void ensure_initialised() {
-    if (!(state->grid_cell && state->stand && state->patch)) {
+    if (!(state && state->grid_cell && state->stand && state->patch)) {
         throw std::runtime_error("LPJ-Guess environment has not been initialised. Please call initialise().");
     }
 }
