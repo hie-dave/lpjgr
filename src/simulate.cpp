@@ -51,13 +51,9 @@ void simulate_until(bool (*delegate)()) {
 
 void simulate_until(predicate* delegate) {
     ensure_initialised();
-    unsigned int output_freq = 1;
-    unsigned int num_days_simulated = 0;
 
     while ( !(delegate->evaluate()) ) {
         simulate_day();
-
-        num_days_simulated++;
     }
 }
 

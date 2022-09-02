@@ -190,5 +190,6 @@ ObjectOutputRegistryBase<double>* get_met_outputs() {
     registry->register_output(agdd5);
     registry->register_output(gdd0);
     registry->register_output(agdd0);
+	registry->register_output(gtemp);
 	return registry;
 }

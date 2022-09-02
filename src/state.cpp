@@ -81,12 +81,19 @@ int save_simulation_state() {
 //'
 // [[Rcpp::export]]
 void load_simulation_state(int state_id) {
-    if (state_id >= save_states.size()) {
+	if (state_id < 0) {
+		std::ostringstream buf;
+		buf << "Invalid state id: " << state_id;
+		throw std::runtime_error(buf.str());
+	}
+
+	std::size_t id = static_cast<std::size_t>(state_id);
+    if (id >= save_states.size()) {
 		std::ostringstream buf;
 		buf << "Invalid state id: " << state_id;
         throw std::runtime_error(buf.str());
     }
-    ISaveState* saved_state = save_states[state_id];
+    ISaveState* saved_state = save_states[id];
 	load_state(saved_state);
 }
 

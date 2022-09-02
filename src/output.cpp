@@ -78,7 +78,7 @@ void store_output_metadata(Rcpp::CharacterMatrix* matrix, std::string category_n
     ObjectOutputRegistryBase<double>* registry = get_output_registry(category_name);
     int row = start;
     std::vector<std::string> outputs = registry->list_output_names();
-    for (int i = 0; i < outputs.size(); i++) {
+    for (std::size_t i = 0; i < outputs.size(); i++) {
         int col = 0;
         (*matrix)(row, col++) = category_name;
         (*matrix)(row, col++) = outputs[i];

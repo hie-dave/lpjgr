@@ -51,9 +51,9 @@ MetadataFile::MetadataFile(std::string dir) {
 	char ins_file_buf[4096];
 	int err = fscanf(
 		meta_file,
-		"%d-%d\n%d\n%s",
-		year,
-		dayofyear,
+		"%d-%d\n%s",
+		&year,
+		&dayofyear,
 		ins_file_buf);
 	instruction_file = std::string(ins_file_buf);
 
@@ -77,7 +77,7 @@ void MetadataFile::save(std::string dir) {
 
 	// 1. Write to the file.
 	int err = fprintf(meta_file,
-		"%d-%d\n%d\n%s",
+		"%d-%d\n%s",
 		year,
 		dayofyear,
 		instruction_file.c_str());

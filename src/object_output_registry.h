@@ -24,9 +24,9 @@ class ObjectOutputRegistry : public virtual ObjectOutputRegistryBase<tprop>, pub
                                     of all objects encapsulated by this registry.
         */
         ObjectOutputRegistry(std::string name, tobj *(*instance_accessor)(std::string object_name), std::vector<std::string> (*instance_enumerator)())
-            : instance_accessor(instance_accessor)
-            , instance_enumerator(instance_enumerator)
-            , OutputRegistry<tobj, tprop>(name) {
+            : OutputRegistry<tobj, tprop>(name)
+			, instance_accessor(instance_accessor)
+            , instance_enumerator(instance_enumerator) {
         }
 
         /*
