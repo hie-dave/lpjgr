@@ -48,12 +48,14 @@ MetadataFile::MetadataFile(std::string dir) {
 	}
 
 	// 1. Parse the file.
+	char ins_file_buf[4096];
 	int err = fscanf(
 		meta_file,
 		"%d-%d\n%d\n%s",
 		year,
 		dayofyear,
-		instruction_file);
+		ins_file_buf);
+	instruction_file = std::string(ins_file_buf);
 
 	// 2. Close the file.
 	err = fclose(meta_file);
@@ -78,7 +80,7 @@ void MetadataFile::save(std::string dir) {
 		"%d-%d\n%d\n%s",
 		year,
 		dayofyear,
-		instruction_file);
+		instruction_file.c_str());
 	if (err < 0) {
 		throw std::runtime_error("Unable to write to metadata file '"
 		+ meta_file_name + "': " + strerror(errno));
