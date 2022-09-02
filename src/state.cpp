@@ -111,8 +111,8 @@ void load_simulation_state(int state_id) {
 // [[Rcpp::export]]
 void save_state_to_dir(std::string dirname) {
 	// Don't use the save state queue for this implementation.
-	std::unique_ptr<DiskBoundSaveState> state = std::unique_ptr<DiskBoundSaveState>(new DiskBoundSaveState(dirname));
-	state->save();
+	DiskBoundSaveState state(dirname);
+	state.save();
 }
 
 //'

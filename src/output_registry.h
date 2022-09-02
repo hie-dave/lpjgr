@@ -53,7 +53,7 @@ class OutputRegistry : public virtual OutputRegistryBase {
         /*
         Get a property value encapsulated by this registry for the given object.
         */
-        tprop get_output(tobj* object, std::string name) {
+        virtual tprop get_output(tobj* object, std::string name) {
             ensure_contains(name);
             return output_map[name]->get_value(object);
         }
@@ -82,7 +82,7 @@ class OutputRegistry : public virtual OutputRegistryBase {
         Get a description of the specified output.
         @param output_name: Name of the output.
         */
-        std::string get_description(std::string output_name) {
+        virtual std::string get_description(std::string output_name) {
             ensure_contains(output_name);
             return output_map[output_name]->get_description();
         }

@@ -36,23 +36,39 @@ class ObjectOutputRegistry : public virtual ObjectOutputRegistryBase<tprop>, pub
         @param object_name: Name of the object.
         @param output_name: Name of the output of the object.
         */
-        tprop get_output(std::string object_name, std::string output_name) {
+        tprop get_output(std::string object_name, std::string output_name) override {
             OutputRegistry<tobj, tprop>::ensure_contains(output_name);
             tobj* instance = instance_accessor(object_name);
             return OutputRegistry<tobj, tprop>::get_output(instance, output_name);
         }
 
         /*
+        Get a property value encapsulated by this registry for the given object.
+        */
+        tprop get_output(tobj* object, std::string name) override {
+			// Just call into base class.
+			return OutputRegistry<tobj, tprop>::get_output(object, name);
+		}
+
+        /*
         Get a human-readable description of the output registry.
         */
-        std::string get_description() {
+        std::string get_description() override {
             return OutputRegistry<tobj, tprop>::name;
+        }
+
+        /*
+        Get a description of the specified output.
+        @param output_name: Name of the output.
+        */
+        std::string get_description(std::string output_name) override {
+            return OutputRegistry<tobj, tprop>::get_description(output_name);
         }
 
         /*
         Return the names of all valid objects encapsulated by this registry.
         */
-        std::vector<std::string> list_object_names() {
+        std::vector<std::string> list_object_names() override {
             return instance_enumerator();
         }
     private:
