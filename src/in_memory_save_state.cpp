@@ -48,8 +48,6 @@ void InMemorySaveState::Load(SimulationState* new_state) {
 	} else {
 		new_state->grid_cell = state->grid_cell;
 		new_state->date = &date;
-		new_state->stand = get_stand(new_state->grid_cell);
-		new_state->patch = get_patch(new_state->stand);
 		new_state->input_module = state->input_module;
 		new_state->instruction_file = state->instruction_file;
 	}
@@ -58,6 +56,9 @@ void InMemorySaveState::Load(SimulationState* new_state) {
 	// can now deserialize our previous state into the gridcell.
 	GuessDeserializer deserializer(&state_buf, &meta_buf);
 	deserializer.deserialize_gridcell(*new_state->grid_cell);
+
+	new_state->stand = get_stand(new_state->grid_cell);
+	new_state->patch = get_patch(new_state->stand);
 
 	// Set current simulation date.
 	new_state->date->init(1);
