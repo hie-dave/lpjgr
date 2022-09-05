@@ -98,6 +98,14 @@ void initialise(std::string insFile) {
 	initialise_state(insFile, state.get());
 }
 
+void reference_output_modules() {
+	// This function is never called, and doesn't do anything.
+	// However, it does reference a few output module types, to ensure
+	// that the linker includes them in the output library.
+	GuessOutput::CommonOutput common;
+	GuessOutput::MiscOutput misc;
+}
+
 /*
 This function exists for internal use only. It will initialise the
 specified state object but will otherwise have no effect on the global
@@ -118,12 +126,10 @@ void initialise_state(std::string insFile, SimulationState* state) {
     // todo: make input module type an argument
     InputModule* input_module = new SiteInput;
 
-    GuessOutput::MiscOutput misc;
-    GuessOutput::CommonOutput common;
-
 	GuessOutput::OutputModuleContainer output_modules;
-
 	GuessOutput::OutputModuleRegistry::get_instance().create_all_modules(output_modules);
+
+	// lpjgr output initialisation.
     register_outputs();
 
     read_instruction_file(insFile.c_str());
