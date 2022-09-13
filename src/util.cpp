@@ -2,6 +2,8 @@
 #include <vector>
 #include <Rcpp.h>
 
+#include "date.h"
+#include "guess.h"
 #include "util.h"
 
 /*
@@ -13,4 +15,8 @@ Rcpp::CharacterVector vec_to_rvec(std::vector<std::string> vec) {
         rvec[i] = vec[i];
     }
     return rvec;
+}
+
+lpjgr_date create_date(const Date* date) {
+	return lpjgr_date(date->get_calendar_year(), date->month, date->dayofmonth);
 }

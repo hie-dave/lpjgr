@@ -3,10 +3,10 @@
 #include "simulate.h"
 #include "state.h"
 #include "util.h"
+#include "date.h"
 
 // Defined in framework.o (aka framework.cpp).
-void simulate_day(Gridcell& gridcell, InputModule* input_module);
-
+void simulate_day(Gridcell&, InputModule*);
 
 //'
 //' Simulate a single day
@@ -15,13 +15,15 @@ void simulate_day(Gridcell& gridcell, InputModule* input_module);
 //'
 // [[Rcpp::export]]
 void simulate_day() {
+	ensure_initialised();
 	simulate_day(*state->grid_cell, state->input_module);
 	state->grid_cell->balance.check_period(*state->grid_cell);
-	date.next();
+	state->date->next();
     if (!state->input_module->getclimate(*state->grid_cell)) {
         // No met data available - abort!
         char buf[256];
-        sprintf(buf, "Day simulated successfully, but no more met data remaining (date=%d-%d-%d)", date.get_calendar_year(), date.month, date.day);
+        sprintf(buf, "Day simulated successfully, but no more met data remaining (date=%d-%d-%d)",
+		state->date->get_calendar_year(), state->date->month, state->date->day);
         throw std::runtime_error(buf);
     }
 }
@@ -74,6 +76,28 @@ class NumTreePredicate : public predicate {
         int num_trees;
 };
 
+/*
+A predicate implementation which compares the current date to a target
+date using a user defined comparison.
+*/
+class DatePredicate : public predicate {
+	public:
+		/*
+		Constructor.
+		@param date: The target date.
+		@param delegate: The user-defined comparison between the current and target dates.
+		*/
+		DatePredicate(const lpjgr_date* date, bool (*delegate)(const lpjgr_date* current, const lpjgr_date* target)) : target(date), delegate(delegate) {
+		}
+		bool evaluate() {
+			lpjgr_date current = create_date(state->date);
+			return delegate(&current, target);
+		}
+	private:
+		const lpjgr_date* target;
+		bool (*delegate)(const lpjgr_date* current, const lpjgr_date* target);
+};
+
 //'
 //' Simulate until tree establishment occurs
 //'
@@ -98,6 +122,47 @@ class NumTreePredicate : public predicate {
 //'
 // [[Rcpp::export]]
 void simulate_until_tree_establishment(int num_trees) {
+	ensure_initialised();
     NumTreePredicate expr(num_trees);
     simulate_until(&expr);
+}
+
+//'
+//' Run the simulation until the specified date.
+//'
+//' @description
+//'
+//' Run the simulation until the specified date (the specified date
+//' will not be simulated, but the day before will be).
+//'
+//' @details
+//'
+//' This will yield an error for invalid dates.
+//'
+//' @param target: The target date.
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+void simulate_until_date(lpjgr_date target) {
+	ensure_initialised();
+
+	lpjgr_date current(
+		state->date->get_calendar_year(),
+		state->date->month,
+		state->date->dayofmonth);
+
+	if (current.is_after(&target)) {
+		char buf[256];
+		sprintf(buf,
+			"Cannot simulate until %hd-%hd-%hd: Current date (%d-%d-%d) is already later than this date",
+			target.get_year(), target.get_month() + 1, target.get_day() + 1,
+			date.get_calendar_year(), date.month + 1, date.dayofmonth + 1);
+		throw std::runtime_error(buf);
+	}
+
+	DatePredicate pred(&target, [](const lpjgr_date* current, const lpjgr_date* target) -> bool {
+		return target->is_equal(current);
+	});
+	simulate_until(&pred);
 }

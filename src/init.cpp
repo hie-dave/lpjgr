@@ -26,6 +26,7 @@
 #include "state.h"
 #include "output.h"
 #include "simulate.h"
+#include "util.h"
 
 /*
 Set our shell for the model to communicate with the world. Failure to
@@ -191,4 +192,23 @@ void initialise_state(std::string insFile, SimulationState* state) {
 	state->stand = stand;
 
     // We are now ready to call simulation functions.
+}
+
+#include "date.h"
+
+//'
+//' Get the current simulation date.
+//'
+//' @description
+//'
+//' Get the current simulation date (ie the date which will be
+//' simulated on the next call to simulate_day()).
+//'
+//' @export
+//'
+// [[Rcpp::export]]
+lpjgr_date get_date() {
+	ensure_initialised();
+	lpjgr_date dt = create_date(state->date);
+	return dt;
 }

@@ -6,6 +6,8 @@
 #include "Rcpp.h"
 
 #include "gutil.h"
+#include "date.h"
+#include "guess.h"
 
 /*
 Count the number of items in the list for which the given delegate expression
@@ -56,5 +58,10 @@ int sum(const std::map<tkey, tvalue*>* map, int (*selector)(const tvalue*)) {
 Convert a vector to an Rcpp vector (string vectors only).
 */
 Rcpp::CharacterVector vec_to_rvec(std::vector<std::string> vec);
+
+/*
+Convert lpj-guess date to lpjgr date.
+*/
+lpjgr_date create_date(const Date* date);
 
 #endif // _LPJGR_UTIL_H_
